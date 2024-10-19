@@ -43,6 +43,7 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
             "sudo apt-get install -y zsh curl git build-essential",
         ]
 
+        # nb! USER is being escaped in the python string, not in the shell command!
         create_user = [
             f"sudo useradd -m -s /usr/bin/zsh {USER}",
             f"sudo usermod -aG sudo {USER}",
@@ -53,6 +54,10 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
             f"su - {USER} -c 'sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended'",
             f"echo 'export SHELL=/usr/bin/zsh' | sudo tee -a /home/{USER}/.bashrc",
             f"echo 'exec /usr/bin/zsh' | sudo tee -a /home/{USER}/.bashrc",
+            # without these the session manager puts us someplace weird
+            f"echo 'cd /home/{USER}' | sudo tee -a /home/{USER}/.zshrc",
+            f"echo 'cd /home/{USER}' | sudo tee -a /home/{USER}/.bashrc",
+            f"echo 'cd /home/{USER}' | sudo tee -a /etc/profile",
         ]
 
         set_permissions = [
@@ -62,14 +67,14 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
         ]
 
         configure_from_dotfiles_repo = [
-            "git clone https://github.com/anniecherk/dotfiles.git /home/${USER}/dotfiles",
-            "cd /home/${USER}/dotfiles/ubuntu",
+            "git clone https://github.com/anniecherk/dotfiles.git /home/{USER}/dotfiles",
+            "cd /home/{USER}/dotfiles/ubuntu",
             "sudo ./install.sh",
             "./ubuntu_install.sh",
         ]
 
-
-        # Combine all commands
+        # the time has come: 
+        # we have all the ingredients, let us brew the potion
         startup_commands = ec2.UserData.for_linux()
         startup_commands.add_commands(*(
             update_system +
@@ -79,6 +84,8 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
             set_permissions +
             configure_from_dotfiles_repo
         ))
+        # for debugging you can see the results of the startup commands
+        # via `sudo cat /var/log/cloud-init-output.log` on the instance
 
         # Define the EC2 instance
         instance = ec2.Instance(
@@ -94,5 +101,5 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
             user_data=startup_commands
         )
 
-        # Output the Instance ID
+        # output the instance id: we need this to be able to easily connect
         CfnOutput(self, "InstanceId", value=instance.instance_id)
