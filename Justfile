@@ -1,4 +1,3 @@
-
 # first time set up:
 #
 # template was gen'd w:
@@ -17,17 +16,27 @@
 
 # run whenever you want to change the infra
 deploy:
+    #!/bin/zsh
     # source .venv/bin/activate
+    export AWS_ACCOUNT_FOR_EC2_TINY_LINUX_CDK_SPEC=$(aws sts get-caller-identity --query "Account" --output text)
+    export AWS_REGION_FOR_EC2_TINY_LINUX_CDK_SPEC="us-west-2"
     cdk deploy
 
-connect: 
+connect:
     #!/bin/zsh
+    # source .venv/bin/activate
+    export AWS_ACCOUNT_FOR_EC2_TINY_LINUX_CDK_SPEC=$(aws sts get-caller-identity --query "Account" --output text)
+    export AWS_REGION_FOR_EC2_TINY_LINUX_CDK_SPEC="us-west-2"
     instanceID=$(aws cloudformation describe-stacks --stack-name AwsEc2TinyLinuxCdkSpecStack --query "Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue" --output text)
-    aws ssm start-session --target $instanceID --document-name AWS-StartInteractiveCommand --parameters command="/usr/local/bin/session-manager-zsh.sh"
+    aws ssm start-session --target $instanceID --document-name AWS-StartInteractiveCommand --parameters command="sudo -u pumpernickle /bin/zsh -l"
 
 
 # destroys the instance & vpc & iam role & everything else
 # if u don't do this u'll keep getting billed for all the resources being up
 destroy:
+    #!/bin/zsh
     # source .venv/bin/activate
+    export AWS_ACCOUNT_FOR_EC2_TINY_LINUX_CDK_SPEC=$(aws sts get-caller-identity --query "Account" --output text)
+    export AWS_REGION_FOR_EC2_TINY_LINUX_CDK_SPEC="us-west-2"
     cdk destroy
+
