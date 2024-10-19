@@ -23,7 +23,7 @@ deploy:
 connect: 
     #!/bin/zsh
     instanceID=$(aws cloudformation describe-stacks --stack-name AwsEc2TinyLinuxCdkSpecStack --query "Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue" --output text)
-    aws ssm start-session --target $instanceID 
+    aws ssm start-session --target $instanceID --document-name AWS-StartInteractiveCommand --parameters command="/usr/local/bin/session-manager-zsh.sh"
 
 
 # destroys the instance & vpc & iam role & everything else
