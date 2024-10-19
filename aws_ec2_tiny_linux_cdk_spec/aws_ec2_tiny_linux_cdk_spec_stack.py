@@ -61,6 +61,14 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
             f"sudo chmod -R u+w /home/{USER}",
         ]
 
+        configure_from_dotfiles_repo = [
+            "git clone https://github.com/anniecherk/dotfiles.git /home/${USER}/dotfiles",
+            "cd /home/${USER}/dotfiles/ubuntu",
+            "sudo ./install.sh",
+            "./ubuntu_install.sh",
+        ]
+
+
         # Combine all commands
         startup_commands = ec2.UserData.for_linux()
         startup_commands.add_commands(*(
@@ -68,7 +76,8 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
             install_tools +
             create_user +
             configure_zsh +
-            set_permissions
+            set_permissions +
+            configure_from_dotfiles_repo
         ))
 
         # Define the EC2 instance

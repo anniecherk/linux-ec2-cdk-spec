@@ -1,7 +1,8 @@
-# aws cdk for a tiny linux instance
+# AWS CDK for a Tiny Linux Instance
 
-just cdk boilerplate + a min ec2 config
+push-button ubuntu instance w/ my dotfiles
 
+✨🦝🤖🐾🌈💃🌟🚀🔧💥✨
 
-TODO:
-- install dotfiles
+--> don't forget to destory it
+

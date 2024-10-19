@@ -20,7 +20,10 @@ deploy:
     # source .venv/bin/activate
     export AWS_ACCOUNT_FOR_EC2_TINY_LINUX_CDK_SPEC=$(aws sts get-caller-identity --query "Account" --output text)
     export AWS_REGION_FOR_EC2_TINY_LINUX_CDK_SPEC="us-west-2"
-    cdk deploy
+    cdk deploy --require-approval never
+    # Pause to give the instance time to set itself up
+    sleep 60
+    echo "🎉✨ instance is up, lets goooooo 🐾🌟"
 
 connect:
     #!/bin/zsh
@@ -38,5 +41,7 @@ destroy:
     # source .venv/bin/activate
     export AWS_ACCOUNT_FOR_EC2_TINY_LINUX_CDK_SPEC=$(aws sts get-caller-identity --query "Account" --output text)
     export AWS_REGION_FOR_EC2_TINY_LINUX_CDK_SPEC="us-west-2"
-    cdk destroy
+    cdk destroy --force # force just skips the confirmation prompt
 
+hard-restart: destroy deploy
+    @echo "🧹 brand new instance up & ready"
