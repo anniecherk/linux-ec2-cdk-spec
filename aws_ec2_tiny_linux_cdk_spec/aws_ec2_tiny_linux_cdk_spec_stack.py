@@ -69,7 +69,6 @@ class AwsEc2TinyLinuxCdkSpecStack(Stack):
         configure_from_dotfiles_repo = [
             "git clone https://github.com/anniecherk/dotfiles.git /home/{USER}/dotfiles",
             "cd /home/{USER}/dotfiles/ubuntu",
-            "sudo ./install.sh",
             "./ubuntu_install.sh",
         ]
 
